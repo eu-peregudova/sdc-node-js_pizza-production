@@ -1,15 +1,25 @@
-import fastify from 'fastify'
+import fastify from 'fastify';
+import { registerHealthCheckController } from './controllers/healthCheckController';
+import { registerIngredientStockController } from './controllers/ingredientStockController';
+import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
+import { ErrorWithStatus } from './shared/types';
 
-const server = fastify()
+export function createApp() {
+  const app = fastify();
 
-server.get('/ping', async (request, reply) => {
-  return 'pong\n'
-})
+  app.setValidatorCompiler(validatorCompiler);
+  app.setSerializerCompiler(serializerCompiler);
 
-server.listen({ port: 8080 }, (err, address) => {
-  if (err) {
-    console.error(err)
-    process.exit(1)
-  }
-  console.log(`Server listening at ${address}`)
-})
+  registerHealthCheckController(app);
+  registerIngredientStockController(app);
+
+  app.setErrorHandler((error: ErrorWithStatus, _req, res) => {
+    if (error.statusCode === 400) {
+      return res.status(400).send(error.message);
+    }
+
+    return res.status(500).send('Internal Server Error');
+  });
+
+  return app;
+}
