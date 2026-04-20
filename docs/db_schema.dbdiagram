@@ -1,0 +1,35 @@
+{
+  "version": "1.0.0",
+  "darkMode": true,
+  "gridEnabling": false,
+  "detailLevel": "All",
+  "tablePositions": [
+    {
+      "name": "warehouse",
+      "schemaName": "public",
+      "x": 713.3471062500001,
+      "y": 44
+    },
+    {
+      "name": "shipment",
+      "schemaName": "public",
+      "x": 410.341796875,
+      "y": 12
+    },
+    {
+      "name": "shipment_content",
+      "schemaName": "public",
+      "x": 396.35205078125,
+      "y": -161
+    },
+    {
+      "name": "ingredient",
+      "schemaName": "public",
+      "x": 162.722775,
+      "y": -129
+    }
+  ],
+  "tableGroupCollapseStates": [],
+  "stickyNoteLayouts": [],
+  "referencePaths": []
+}
