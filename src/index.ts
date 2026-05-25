@@ -1,5 +1,6 @@
-import { createApp } from './main';
+import { createApp, initializeEnv } from './main';
 
+initializeEnv();
 const app = createApp();
 
 app

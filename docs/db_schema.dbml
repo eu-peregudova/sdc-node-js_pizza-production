@@ -1,0 +1,25 @@
+Table warehouse {
+  id uuid [primary key]
+  name varchar
+}
+
+Table shipment {
+  id uuid [primary key]
+  warehouse_id uuid
+  created_at timestamp
+}
+
+Table shipment_content {
+  shipment_id uuid
+  ingredient_id uuid
+  units number
+}
+
+Table ingredient {
+  id uuid [primary key]
+  name varchar
+}
+
+Ref: shipment.warehouse_id > warehouse.id
+Ref: shipment_content.shipment_id > shipment.id
+Ref: shipment_content.ingredient_id > ingredient.id
