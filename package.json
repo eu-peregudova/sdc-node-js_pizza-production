@@ -1,42 +1,19 @@
 {
-  "name": "practice-1",
-  "version": "1.0.0",
-  "description": "",
+  "name": "pizza-production",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "start": "npm run build && node ./dist/index.js",
-    "test": "vitest",
+    "start": "npm run start --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
     "lint": "eslint src --ext .ts --fix && npm run format",
     "format": "prettier --write \"src/**/*.ts\""
   },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "dotenv": "^17.4.0",
-    "drizzle-orm": "^0.45.2",
-    "fastify": "^5.8.2",
-    "fastify-cli": "^7.4.1",
-    "fastify-type-provider-zod": "^6.1.0",
-    "pg": "^8.20.0",
-    "zod": "^4.3.6"
-  },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@types/better-sqlite3": "^7.6.13",
-    "@types/node": "^25.5.0",
-    "@types/pg": "^8.20.0",
-    "@typescript-eslint/eslint-plugin": "^8.57.2",
-    "@typescript-eslint/parser": "^8.57.2",
-    "better-sqlite3": "^12.9.0",
-    "drizzle-kit": "^0.31.10",
-    "eslint": "^10.1.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.5",
-    "jiti": "^2.6.1",
-    "prettier": "^3.8.1",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.57.2",
-    "vitest": "^4.1.0"
+    "prettier": "^3.0.0"
   }
 }

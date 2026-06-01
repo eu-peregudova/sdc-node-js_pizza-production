@@ -1,4 +1,4 @@
-import { BaseWarehouse } from './BaseWarehouse';
+import { BaseWarehouse } from './BaseWarehouse.js';
 
 export class WarehouseSmall extends BaseWarehouse {
   constructor() {

@@ -1,9 +1,9 @@
-import { ErrorWithStatus, PartialShipmentError, Shipment, TargetWarehouse } from '../shared/types';
-import { ShipmentRepository } from '../repositories/shipmentRepository';
-import { WarehouseDecision } from './warehouses/BaseWarehouse';
-import { WarehouseLarge } from './warehouses/WarehouseLarge';
-import { WarehouseSmall } from './warehouses/WarehouseSmall';
-import { WarehouseStandard } from './warehouses/WarehouseStandard';
+import { ErrorWithStatus, PartialShipmentError, Shipment, TargetWarehouse } from '../shared/types.js';
+import { ShipmentRepository } from '../repositories/shipmentRepository.js';
+import { WarehouseDecision } from './warehouses/BaseWarehouse.js';
+import { WarehouseLarge } from './warehouses/WarehouseLarge.js';
+import { WarehouseSmall } from './warehouses/WarehouseSmall.js';
+import { WarehouseStandard } from './warehouses/WarehouseStandard.js';
 
 
 export class ShipmentService {

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from 'vitest';
-import { createApp } from '../main';
+import { createApp } from '../main.js';
 import { FastifyInstance } from 'fastify';
 
 describe('healthCheckController', () => {

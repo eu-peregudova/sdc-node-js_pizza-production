@@ -1,4 +1,4 @@
-import { Shipment } from '../../shared/types';
+import { Shipment } from '../../shared/types.js';
 
 export enum WarehouseDecision {
   REJECT = 'reject',

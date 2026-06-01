@@ -1,18 +1,9 @@
 import fastify from 'fastify';
-import { registerHealthCheckController } from './controllers/healthCheckController';
-import { registerShipmentController } from './controllers/shipmentController';
+import { registerHealthCheckController } from './controllers/healthCheckController.js';
+import { registerShipmentController } from './controllers/shipmentController.js';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
-import { ErrorWithStatus } from './shared/types';
-import dotenv from 'dotenv';
-import path from 'node:path';
+import { ErrorWithStatus } from './shared/types.js';
 
-export function initializeEnv() {
-  const result = dotenv.config({
-    path: path.resolve(process.cwd(), '.env'),
-  });
-
-  return result;
-}
 
 export function createApp() {
   const app = fastify();

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { Shipment, TargetWarehouse } from '../shared/types';
-import { ShipmentService } from './ShipmentService';
-import { ShipmentRepository } from '../repositories/shipmentRepository';
+import { Shipment, TargetWarehouse } from '../shared/types.js';
+import { ShipmentService } from './ShipmentService.js';
+import { ShipmentRepository } from '../repositories/shipmentRepository.js';
 
 describe('ShipmentService', () => {
   let service: ShipmentService;

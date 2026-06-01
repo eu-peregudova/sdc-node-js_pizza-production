@@ -1,7 +1,7 @@
-import { db as defaultDb } from '../db';
-import { shipmentTable, shipmentContentTable, warehouseTable } from '../db/schema';
+import { db as defaultDb } from '../db/index.js';
+import { shipmentTable, shipmentContentTable, warehouseTable } from '../db/schema.js';
 import { eq, inArray } from 'drizzle-orm';
-import { Shipment } from '../shared/types';
+import { Shipment } from '../shared/types.js';
 
 export interface IngredientItem {
   ingredient_id: string;

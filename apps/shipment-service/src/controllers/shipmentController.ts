@@ -1,8 +1,8 @@
 import { FastifyInstance } from 'fastify';
-import { shipmentSchema, PartialShipmentError } from '../shared/types';
+import { shipmentSchema, PartialShipmentError } from '../shared/types.js';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
-import { ShipmentRepository } from '../repositories/shipmentRepository';
-import { ShipmentService } from '../services/ShipmentService';
+import { ShipmentRepository } from '../repositories/shipmentRepository.js';
+import { ShipmentService } from '../services/ShipmentService.js';
 import z from 'zod';
 
 export function registerShipmentController(app: FastifyInstance): void {

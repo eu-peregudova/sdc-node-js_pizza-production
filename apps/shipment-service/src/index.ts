@@ -1,6 +1,6 @@
-import { createApp, initializeEnv } from './main';
+import './envinit.js';
+import { createApp } from './main.js';
 
-initializeEnv();
 const app = createApp();
 
 app

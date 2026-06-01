@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it, vi, beforeEach } from 'vitest';
 import { FastifyInstance } from 'fastify';
-import { TargetWarehouse } from '../shared/types';
+import { TargetWarehouse } from '../shared/types.js';
 
 describe('shipmentController', () => {
   let app: FastifyInstance;
