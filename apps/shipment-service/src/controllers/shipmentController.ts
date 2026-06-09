@@ -16,13 +16,7 @@ export function registerShipmentController(app: FastifyInstance): void {
           422: z.object({
             error: z.string(),
             successfulIds: z.array(z.string()),
-            failedShipments: z.array(z.object({
-              targetWarehouse: z.string(),
-              ingredients: z.array(z.object({
-                id: z.string(),
-                units: z.number(),
-              })),
-            })),
+            failedShipments: shipmentSchema.array(),
           }),
         },
       },

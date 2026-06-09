@@ -1,21 +1,27 @@
-import { markPizzasReady } from './services/productionService.js';
+import fastify from 'fastify';
+import { registerAvailabilityController } from './controllers/availabilityController.js';
+import { validatorCompiler, serializerCompiler } from 'fastify-type-provider-zod';
 
-async function main() {
-  console.log('Production Service Started');
+export function createApp() {
+  const app = fastify();
 
-  // Example: Mark some pizzas as ready
-  const pizzas = [
-    { pizzaType: 'margherita', amount: 5 },
-    { pizzaType: 'pepperoni', amount: 3 },
-  ];
+  app.setValidatorCompiler(validatorCompiler);
+  app.setSerializerCompiler(serializerCompiler);
 
-  try {
-    console.log('Marking pizzas as ready:', pizzas);
-    const result = await markPizzasReady(pizzas);
-    console.log('Result:', result);
-  } catch (error) {
-    console.error('Error:', error instanceof Error ? error.message : error);
-  }
+  registerAvailabilityController(app);
+
+  return app;
 }
 
-main();
+const app = createApp();
+const start = async () => {
+  try {
+    await app.listen({ port: 3002 });
+    console.log('Production Service listening on port 3002');
+  } catch (err) {
+    app.log.error(err);
+    process.exit(1);
+  }
+};
+
+start();

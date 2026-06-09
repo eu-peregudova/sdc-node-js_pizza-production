@@ -20,6 +20,7 @@ export function createApp() {
       return res.status(400).send(error.message);
     }
 
+    console.error(error);
     return res.status(500).send('Internal Server Error');
   });
 

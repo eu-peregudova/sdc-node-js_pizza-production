@@ -7,16 +7,17 @@
     "start": "npm run build && node ./dist/main.js",
     "test": "vitest",
     "db:generate": "drizzle-kit generate",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "db:seed": "tsx src/db/seed.ts"
   },
   "dependencies": {
     "@pizza/api-contracts": "*",
     "dotenv": "^17.4.0",
     "drizzle-orm": "^0.45.2",
     "fastify": "^5.8.2",
-    "fastify-type-provider-zod": "^6.1.0",
+    "fastify-type-provider-zod": "^4.0.0",
     "pg": "^8.20.0",
-    "zod": "^4.3.6"
+    "zod": "^3.23.0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",

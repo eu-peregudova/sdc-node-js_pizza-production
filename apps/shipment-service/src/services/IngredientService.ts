@@ -12,6 +12,7 @@ export class IngredientService {
       const ingredient = await this.repository.getIngredientById(ingredientId);
       return ingredient.units;
     } catch (err) {
+      console.log(`Error checking ingredient availability for ID ${ingredientId}:`, err);
       throw err;
     }
   }

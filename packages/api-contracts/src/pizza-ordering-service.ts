@@ -14,7 +14,7 @@ export type Pizza = z.infer<typeof pizzaSchema>;
  * Log entry for a made pizza
  */
 export const pizzaLogSchema = z.object({
-  id: z.uuid().describe('Unique identifier for the log'),
+  id: z.string().uuid().describe('Unique identifier for the log'),
   name: z.string().describe('Name of the pizza'),
   amount: z.number().int().nonnegative().describe('Number of pizzas made'),
   timestamp: z.date().describe('Timestamp when the pizza was made'),
@@ -38,6 +38,23 @@ export const readyPizzasResponseSchema = z.object({
 });
 
 export type ReadyPizzasResponse = z.infer<typeof readyPizzasResponseSchema>;
+
+/**
+ * Request for GET /pizzas/available - Get available pizzas
+ */
+export const availablePizzasRequestSchema = z.string().describe('Pizza name to check availability for');
+
+export type AvailablePizzasRequest = z.infer<typeof availablePizzasRequestSchema>;
+
+/**
+ * Response for GET /pizzas/available
+ */
+export const availablePizzasResponseSchema = z.object({
+  name: z.string().describe('Name of the pizza'),
+  available: z.boolean().describe('Whether the pizza is available'),
+});
+
+export type AvailablePizzasResponse = z.infer<typeof availablePizzasResponseSchema>;
 
 /**
  * API Contract:

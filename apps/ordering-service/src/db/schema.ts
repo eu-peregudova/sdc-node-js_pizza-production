@@ -7,3 +7,10 @@ export const pizzaReadyLogs = pgTable('pizza_logs', {
   timestamp: timestamp().notNull().defaultNow(),
   status: text().notNull().default('ready'),
 });
+
+export const pizzaRecipes = pgTable('pizza_recepies', {
+  id: uuid().primaryKey().defaultRandom(),
+  name: text().notNull(),
+  ingredient_id: uuid().notNull(),
+  amount: numeric().notNull(),
+});

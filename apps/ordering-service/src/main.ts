@@ -1,10 +1,12 @@
 import fastify from 'fastify';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 import { ErrorWithStatus } from '@pizza/api-contracts';
-import { registerReadyController } from './controllers/readyController.js';
+import { registerReadyController } from './controllers/orderController.js';
 
 export function createApp() {
-  const app = fastify();
+  const app = fastify({
+    logger: true,
+  });
 
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
@@ -12,10 +14,11 @@ export function createApp() {
   registerReadyController(app);
 
   app.setErrorHandler((error: ErrorWithStatus, _req, res) => {
-    if (error.statusCode === 400) {
-      return res.status(400).send(error.message);
+    if (error.statusCode === 400 || error.statusCode === 404) {
+      return res.status(error.statusCode).send(error.message);
     }
 
+    console.error('Error occurred:', error);
     return res.status(500).send('Internal Server Error');
   });
 

@@ -25,7 +25,7 @@ export enum TargetWarehouse {
  */
 export const ingredientSchema = z.object({
   id: z.string().describe('Ingredient ID'),
-  units: z.number().describe('Number of units'),
+  units: z.coerce.number().describe('Number of units'),
 });
 
 export type Ingredient = z.infer<typeof ingredientSchema>;
@@ -67,7 +67,7 @@ export class PartialShipmentError extends ErrorWithStatus {
 export const ingredientAvailabilitySchema = z.object({
   id: z.string().describe('Ingredient ID'),
   available: z.boolean().describe('Whether ingredient is available'),
-  units: z.number().nonnegative().describe('Available units'),
+  units: z.coerce.number().nonnegative().describe('Available units'),
 });
 
 export type IngredientAvailability = z.infer<typeof ingredientAvailabilitySchema>;

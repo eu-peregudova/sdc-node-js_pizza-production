@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "npm run start --workspaces --if-present",
+    "start:all": "npm run start --workspace=apps/shipment-service & npm run start --workspace=apps/ordering-service & npm run start --workspace=apps/production-service & wait",
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "lint": "eslint src --ext .ts --fix && npm run format",

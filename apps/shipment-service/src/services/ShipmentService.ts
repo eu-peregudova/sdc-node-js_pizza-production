@@ -13,7 +13,10 @@ import { WarehouseStandard } from './warehouses/WarehouseStandard.js';
 export class ShipmentService {
   private UNIVERSALLY_ACCEPTED_SHIPMENT_SIZE = 400;
   private repository: ShipmentRepository;
-  private warehouseMap = {
+  private warehouseMap: Record<
+    TargetWarehouse,
+    typeof WarehouseSmall | typeof WarehouseStandard | typeof WarehouseLarge
+  > = {
     [TargetWarehouse.SMALL]: WarehouseSmall,
     [TargetWarehouse.STANDARD]: WarehouseStandard,
     [TargetWarehouse.LARGE]: WarehouseLarge,
@@ -24,7 +27,8 @@ export class ShipmentService {
   }
 
   async registerShipment(shipment: Shipment): Promise<string[]> {
-    const warehouse = new this.warehouseMap[shipment.targetWarehouse]();
+    const targetWarehouse = shipment.targetWarehouse as TargetWarehouse;
+    const warehouse = new this.warehouseMap[targetWarehouse]();
 
     const decision = warehouse.checkShipment(shipment);
 

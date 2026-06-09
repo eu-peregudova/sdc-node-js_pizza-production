@@ -38,7 +38,12 @@ First, run the docker
 podman compose up
 ```
 
-Then, the database has to be populated with necessary data (warehouses, ingredients).
+Then, the database has to be populated with necessary data (warehouses, ingredients, pizza recipies).
+
+```
+npm run db:seed -w apps/ordering-service
+npm run db:seed -w apps/shipment-service
+```
 
 After that
 

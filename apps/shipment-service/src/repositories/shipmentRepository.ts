@@ -2,6 +2,7 @@ import { db as defaultDb } from '../db/index.js';
 import { shipmentTable, shipmentContentTable, warehouseTable } from '../db/schema.js';
 import { eq, inArray } from 'drizzle-orm';
 import { Ingredient, Shipment } from '@pizza/api-contracts';
+import { TargetWarehouse } from '../shared/types.js';
 
 export interface ShipmentWithContent {
   id: string;
@@ -29,9 +30,12 @@ export class ShipmentRepository {
 
   async createShipment(shipment: Shipment): Promise<string> {
     let shipmentId: string = '';
-    const warehouseId = await this.getWarehouseIdByName(shipment.targetWarehouse);
+
+    const targetWarehouse: TargetWarehouse = shipment.targetWarehouse as TargetWarehouse;
+
+    const warehouseId = await this.getWarehouseIdByName(targetWarehouse);
     if (!warehouseId) {
-      throw new Error(`Warehouse "${shipment.targetWarehouse}" not found`);
+      throw new Error(`Warehouse "${targetWarehouse}" not found`);
     }
 
     const ingredients: Ingredient[] = shipment.ingredients.map((ing) => ({
