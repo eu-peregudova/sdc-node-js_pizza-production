@@ -4,11 +4,23 @@ import z from 'zod';
  * Pizza type for the made pizzas
  */
 export const pizzaSchema = z.object({
-  pizzaType: z.string().describe('Type of pizza made (e.g., margherita, pepperoni, pineapple)'),
+  name: z.string().describe('Type of pizza made (e.g., margherita, pepperoni, pineapple)'),
   amount: z.number().int().nonnegative().describe('Number of pizzas of this type'),
 });
 
 export type Pizza = z.infer<typeof pizzaSchema>;
+
+/**
+ * Log entry for a made pizza
+ */
+export const pizzaLogSchema = z.object({
+  id: z.uuid().describe('Unique identifier for the log'),
+  name: z.string().describe('Name of the pizza'),
+  amount: z.number().int().nonnegative().describe('Number of pizzas made'),
+  timestamp: z.date().describe('Timestamp when the pizza was made'),
+});
+
+export type PizzaLog = z.infer<typeof pizzaLogSchema>;
 
 /**
  * Request for POST /pizzas/ready - Mark pizzas as ready
@@ -35,8 +47,8 @@ export type ReadyPizzasResponse = z.infer<typeof readyPizzasResponseSchema>;
  * 
  * Request:
  *   [
- *     { pizzaType: 'margherita', amount: 5 },
- *     { pizzaType: 'pepperoni', amount: 3 }
+ *     { name: 'margherita', amount: 5 },
+ *     { name: 'pepperoni', amount: 3 }
  *   ]
  * 
  * Response (200):

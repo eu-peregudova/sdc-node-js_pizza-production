@@ -6,8 +6,8 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: pg-node-hw
-
+    volumes:
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:z
   pgadmin:
     image: dpage/pgadmin4:9.8
     ports:

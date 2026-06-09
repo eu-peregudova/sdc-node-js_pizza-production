@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start": "npm run build && node --trace-deprecation ./dist/index.js",
+    "start": "npm run build && node ./dist/index.js",
     "test": "vitest",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
@@ -14,6 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@pizza/api-contracts": "*",
     "dotenv": "^17.4.0",
     "drizzle-orm": "^0.45.2",
     "fastify": "^5.8.2",

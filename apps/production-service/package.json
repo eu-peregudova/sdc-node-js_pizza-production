@@ -7,7 +7,7 @@
     "build": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@pizza/api-contracts": "workspace:*"
+    "@pizza/api-contracts": "*"
   },
   "devDependencies": {
     "@types/node": "^20.10.6",
