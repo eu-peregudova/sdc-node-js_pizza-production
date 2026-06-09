@@ -1,18 +1,13 @@
 import { db as defaultDb } from '../db/index.js';
 import { shipmentTable, shipmentContentTable, warehouseTable } from '../db/schema.js';
 import { eq, inArray } from 'drizzle-orm';
-import { Shipment } from '../shared/types.js';
-
-export interface IngredientItem {
-  ingredient_id: string;
-  units: number;
-}
+import { Ingredient, Shipment } from '@pizza/api-contracts';
 
 export interface ShipmentWithContent {
   id: string;
   warehouse_id: string;
   created_at: Date;
-  content: IngredientItem[];
+  content: Ingredient[];
 }
 
 export class ShipmentRepository {
@@ -24,11 +19,11 @@ export class ShipmentRepository {
       .from(warehouseTable)
       .where(eq(warehouseTable.name, name))
       .limit(1);
-  
+
     if (!warehouse || warehouse.length === 0) {
       return null;
     }
-  
+
     return warehouse[0].id;
   }
 
@@ -39,15 +34,18 @@ export class ShipmentRepository {
       throw new Error(`Warehouse "${shipment.targetWarehouse}" not found`);
     }
 
-    const ingredients: IngredientItem[] = shipment.ingredients.map((ing) => ({
-      ingredient_id: ing.id,
+    const ingredients: Ingredient[] = shipment.ingredients.map((ing) => ({
+      id: ing.id,
       units: ing.units,
     }));
 
     await this.db.transaction(async (tx) => {
-      const result = await tx.insert(shipmentTable).values({
-        warehouse_id: warehouseId,
-      }).returning({ id: shipmentTable.id });
+      const result = await tx
+        .insert(shipmentTable)
+        .values({
+          warehouse_id: warehouseId,
+        })
+        .returning({ id: shipmentTable.id });
 
       shipmentId = result[0].id;
 
@@ -55,7 +53,7 @@ export class ShipmentRepository {
         await tx.insert(shipmentContentTable).values(
           ingredients.map((ing) => ({
             shipment_id: shipmentId,
-            ingredient_id: ing.ingredient_id,
+            ingredient_id: ing.id,
             units: ing.units.toString(),
           }))
         );
@@ -86,15 +84,15 @@ export class ShipmentRepository {
       warehouse_id: shipment[0].warehouse_id,
       created_at: shipment[0].created_at,
       content: content.map((c) => ({
-        ingredient_id: c.ingredient_id,
+        id: c.ingredient_id,
         units: Number(c.units),
       })),
     };
   }
 
   async getAllShipments(warehouseId?: string): Promise<ShipmentWithContent[]> {
-    let shipments: typeof shipmentTable.$inferSelect[];
-    
+    let shipments: (typeof shipmentTable.$inferSelect)[];
+
     if (warehouseId) {
       shipments = await this.db
         .select()
@@ -105,7 +103,7 @@ export class ShipmentRepository {
     }
 
     const shipmentIds = shipments.map((s) => s.id);
-    
+
     if (shipmentIds.length === 0) {
       return [];
     }
@@ -115,13 +113,13 @@ export class ShipmentRepository {
       .from(shipmentContentTable)
       .where(inArray(shipmentContentTable.shipment_id, shipmentIds));
 
-    const contentByShipmentId: Record<string, IngredientItem[]> = {};
+    const contentByShipmentId: Record<string, Ingredient[]> = {};
     allContent.forEach((c) => {
       if (!contentByShipmentId[c.shipment_id]) {
         contentByShipmentId[c.shipment_id] = [];
       }
       contentByShipmentId[c.shipment_id].push({
-        ingredient_id: c.ingredient_id,
+        id: c.ingredient_id,
         units: Number(c.units),
       });
     });
@@ -141,5 +139,4 @@ export class ShipmentRepository {
       await tx.delete(shipmentTable).where(eq(shipmentTable.id, id));
     });
   }
-
 }

@@ -19,6 +19,7 @@ export const shipmentTable = pgTable("shipment", {
 export const ingredientTable = pgTable("ingredient", {
   id: uuid().primaryKey().defaultRandom(),
   name: varchar({ length: 255 }).notNull(),
+  units: numeric().notNull().default("0"),
 });
 
 export const shipmentContentTable = pgTable("shipment_content", {

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { Shipment, TargetWarehouse } from '../shared/types.js';
+import { Shipment, TargetWarehouse } from '@pizza/api-contracts';
 import { ShipmentService } from './ShipmentService.js';
 import { ShipmentRepository } from '../repositories/shipmentRepository.js';
 
@@ -99,7 +99,8 @@ describe('ShipmentService', () => {
         ],
       };
 
-      const WarehouseLarge = (await import('../services/warehouses/WarehouseLarge.js')).WarehouseLarge;
+      const WarehouseLarge = (await import('../services/warehouses/WarehouseLarge.js'))
+        .WarehouseLarge;
       const originalCheck = WarehouseLarge.prototype.checkShipment;
       vi.spyOn(WarehouseLarge.prototype, 'checkShipment').mockReturnValue('send' as any);
 
@@ -129,16 +130,19 @@ describe('ShipmentService', () => {
         ],
       };
 
-      const WarehouseSmall = (await import('../services/warehouses/WarehouseSmall.js')).WarehouseSmall;
+      const WarehouseSmall = (await import('../services/warehouses/WarehouseSmall.js'))
+        .WarehouseSmall;
       const originalCheck = WarehouseSmall.prototype.checkShipment;
-      
-      vi.spyOn(WarehouseSmall.prototype, 'checkShipment').mockImplementation((shipment: Shipment) => {
-        const totalUnits = shipment.ingredients.reduce((sum, ing) => sum + ing.units, 0);
-        if (totalUnits > 400) {
-          return 'split' as any;
+
+      vi.spyOn(WarehouseSmall.prototype, 'checkShipment').mockImplementation(
+        (shipment: Shipment) => {
+          const totalUnits = shipment.ingredients.reduce((sum, ing) => sum + ing.units, 0);
+          if (totalUnits > 400) {
+            return 'split' as any;
+          }
+          return 'send' as any;
         }
-        return 'send' as any;
-      });
+      );
 
       try {
         const result = await service.registerShipment(smallShipment);
@@ -172,16 +176,19 @@ describe('ShipmentService', () => {
         ],
       };
 
-      const WarehouseSmall = (await import('../services/warehouses/WarehouseSmall.js')).WarehouseSmall;
+      const WarehouseSmall = (await import('../services/warehouses/WarehouseSmall.js'))
+        .WarehouseSmall;
       const originalCheck = WarehouseSmall.prototype.checkShipment;
-      
-      vi.spyOn(WarehouseSmall.prototype, 'checkShipment').mockImplementation((shipment: Shipment) => {
-        const totalUnits = shipment.ingredients.reduce((sum, ing) => sum + ing.units, 0);
-        if (totalUnits > 400) {
-          return 'split' as any;
+
+      vi.spyOn(WarehouseSmall.prototype, 'checkShipment').mockImplementation(
+        (shipment: Shipment) => {
+          const totalUnits = shipment.ingredients.reduce((sum, ing) => sum + ing.units, 0);
+          if (totalUnits > 400) {
+            return 'split' as any;
+          }
+          return 'send' as any;
         }
-        return 'send' as any;
-      });
+      );
 
       try {
         await expect(service.registerShipment(smallShipment)).rejects.toThrow(PartialShipmentError);

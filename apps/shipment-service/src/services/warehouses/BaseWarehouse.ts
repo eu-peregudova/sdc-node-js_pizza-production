@@ -1,4 +1,4 @@
-import { Shipment } from '../../shared/types.js';
+import { Shipment } from '@pizza/api-contracts';
 
 export enum WarehouseDecision {
   REJECT = 'reject',

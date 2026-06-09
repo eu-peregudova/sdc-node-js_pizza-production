@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import { shipmentSchema, PartialShipmentError } from '../shared/types.js';
+import { shipmentSchema, PartialShipmentError } from '@pizza/api-contracts';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { ShipmentRepository } from '../repositories/shipmentRepository.js';
 import { ShipmentService } from '../services/ShipmentService.js';

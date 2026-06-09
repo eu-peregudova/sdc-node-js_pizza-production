@@ -12,11 +12,7 @@ export class PartialShipmentError extends ErrorWithStatus {
   successfulShipmentIds: string[];
   failedShipments: Shipment[];
 
-  constructor(
-    message: string,
-    successfulShipmentIds: string[],
-    failedShipments: Shipment[]
-  ) {
+  constructor(message: string, successfulShipmentIds: string[], failedShipments: Shipment[]) {
     super(message);
     this.statusCode = 422;
     this.successfulShipmentIds = successfulShipmentIds;

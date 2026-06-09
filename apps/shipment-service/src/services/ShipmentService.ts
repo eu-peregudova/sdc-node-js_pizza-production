@@ -1,10 +1,14 @@
-import { ErrorWithStatus, PartialShipmentError, Shipment, TargetWarehouse } from '../shared/types.js';
+import {
+  ErrorWithStatus,
+  PartialShipmentError,
+  Shipment,
+  TargetWarehouse,
+} from '@pizza/api-contracts';
 import { ShipmentRepository } from '../repositories/shipmentRepository.js';
 import { WarehouseDecision } from './warehouses/BaseWarehouse.js';
 import { WarehouseLarge } from './warehouses/WarehouseLarge.js';
 import { WarehouseSmall } from './warehouses/WarehouseSmall.js';
 import { WarehouseStandard } from './warehouses/WarehouseStandard.js';
-
 
 export class ShipmentService {
   private UNIVERSALLY_ACCEPTED_SHIPMENT_SIZE = 400;
@@ -34,7 +38,7 @@ export class ShipmentService {
       const shipments = this.splitShipment(shipment);
       const allShipmentIds: string[] = [];
       const failedSplits: Shipment[] = [];
-      
+
       for (const splitShip of shipments) {
         try {
           const ids = await this.registerShipment(splitShip);
@@ -43,7 +47,7 @@ export class ShipmentService {
           failedSplits.push(splitShip);
         }
       }
-      
+
       if (failedSplits.length > 0) {
         throw new PartialShipmentError(
           `Failed to process ${failedSplits.length} of ${shipments.length} split shipments`,
@@ -51,7 +55,7 @@ export class ShipmentService {
           failedSplits
         );
       }
-      
+
       return allShipmentIds;
     }
 
@@ -71,7 +75,8 @@ export class ShipmentService {
 
     for (const ingredient of leftoverIngredients) {
       if (currentAmount + ingredient.units > this.UNIVERSALLY_ACCEPTED_SHIPMENT_SIZE) {
-        const unitsLeft = currentAmount + ingredient.units - this.UNIVERSALLY_ACCEPTED_SHIPMENT_SIZE;
+        const unitsLeft =
+          currentAmount + ingredient.units - this.UNIVERSALLY_ACCEPTED_SHIPMENT_SIZE;
 
         shipments.push({
           ...shipment,
