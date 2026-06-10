@@ -17,7 +17,7 @@ npm install
 
 ### Configuration
 
-Add environment variables to .env file to shipment-service's root.
+Add environment variables to .env file to shipment-service's and ordering-service's root.
 
 Example:
 
@@ -48,6 +48,6 @@ npm run db:seed -w apps/shipment-service
 After that
 
 ```bash
-npm run start
+npm run start:all
 ```
 

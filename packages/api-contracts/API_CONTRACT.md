@@ -2,62 +2,94 @@
 
 ## Services
 
-This API contract covers two services:
-1. **Pizza Ordering Service** - Get count of pizzas made by type
-2. **Shipment Service** - Register ingredient shipments to warehouses
+This API contract covers three services:
+1. **Ordering Service** (port 3001) - Record and manage pizza orders
+2. **Production Service** (port 3002) - Orchestrate pizza availability and readiness
+3. **Shipment Service** (port 8080) - Register ingredient shipments and check ingredient availability
 
 ---
 
-## Pizza Ordering Service
+## Ordering Service
 
-### Endpoint: GET /pizzas
+### POST /pizzas/ready 
 
-Retrieve count of pizzas made, grouped by type.
+Mark pizzas as ready, recording them in the pizza log.
+> Used by Production Service.
+
+#### Request Body
+
+```json
+[
+  { "name": "Margherita", "amount": 5 },
+  { "name": "Classic", "amount": 3 }
+]
+```
+
+---
+
+### GET /pizzas/is-available
+
+Check if a specific pizza can be made based on ingredient availability. 
+> Delegates to Production Service.
 
 #### Query Parameters
 
 | Parameter | Description |
 |-----------|-------------|
-| `status` | (Optional) Filter by status (e.g., `ready`, `baking`, `delivered`) |
+| `pizzaName` | Name of the pizza to check (required) |
 
-#### Example Requests
+#### Example Request
 
 ```bash
-# Get all pizzas
-GET /pizzas
-
-# Get pizzas with ready status
-GET /pizzas?status=ready
+GET /pizzas/is-available?pizzaName=Margherita
 ```
 
-#### Response (200)
+---
+
+## Production Service
+
+### GET /pizzas/available
+
+Check availability of pizzas based on ingredient request.
+
+>Delegates to Shipment Service.
+
+>Used by Ordering Service.
+
+#### Query Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `ids` | Array of ingredient IDs (repeatable parameter) |
+| `units` | Array of required units per ingredient (repeatable parameter) |
+
+#### Example Request
+
+```bash
+GET /pizzas/available?ids=ingredient-123&ids=ingredient-456&units=50&units=30
+```
+
+---
+
+### POST /pizzas/ready
+
+Mark pizzas as ready.
+> Delegates to Ordering Service.
+
+#### Request Body
 
 ```json
 [
-  { "pizzaType": "pineapple", "amount": 5 },
-  { "pizzaType": "ham", "amount": 1 },
-  { "pizzaType": "margherita", "amount": 3 }
+  { "name": "margherita", "amount": 5 },
+  { "name": "pepperoni", "amount": 3 }
 ]
-```
-
-#### TypeScript Usage
-
-```typescript
-import { GetPizzasResponse, getPizzasResponseSchema } from '@pizza/api-contracts';
-
-async function getPizzas(status?: string): Promise<GetPizzasResponse> {
-  const query = status ? `?status=${status}` : '';
-  const response = await fetch(`/pizzas${query}`);
-  const data = await response.json();
-  return getPizzasResponseSchema.parse(data);
-}
 ```
 
 ---
 
 ## Shipment Service
 
-### Endpoint: POST /shipment
+### POST /shipment
 
 Register ingredients for shipment to a warehouse. May create multiple shipments if contents need to be split.
 
@@ -67,39 +99,19 @@ Register ingredients for shipment to a warehouse. May create multiple shipments 
 {
   "targetWarehouse": "M",
   "ingredients": [
-    { "id": "ingredient-123", "units": 50 },
+    { "id": "ingredient-123", "units": 50 }, 
     { "id": "ingredient-456", "units": 30 }
-  ]
+  ] // id has to be already in DB, consult seed.ts
 }
 ```
 
-#### Request Schema
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `targetWarehouse` | string | Warehouse size: `S` (Small), `M` (Standard), `L` (Large) |
-| `ingredients` | array | List of ingredients to ship |
-| `ingredients[].id` | string | Ingredient identifier |
-| `ingredients[].units` | number | Number of units |
-
-#### Response (200) - Success
-
-Array of shipment IDs:
-
-```json
-[
-  "550e8400-e29b-41d4-a716-446655440000",
-  "550e8400-e29b-41d4-a716-446655440001"
-]
-```
-
-#### Response (422) - Partial Failure
+#### Special Response: (422) - Partial Failure (We added something, but not all)
 
 Some shipments succeeded, some failed:
 
 ```json
 {
-  "error": "Some shipments failed validation",
+  "error": "Failed to process 1 of 3 split shipments",
   "successfulIds": [
     "550e8400-e29b-41d4-a716-446655440000"
   ],
@@ -114,45 +126,23 @@ Some shipments succeeded, some failed:
 }
 ```
 
-#### TypeScript Usage
+---
 
-```typescript
-import { 
-  shipmentSchema, 
-  TargetWarehouse, 
-  PartialShipmentError 
-} from '@pizza/api-contracts';
+### GET /ingredients/availability
 
-async function registerShipment(
-  targetWarehouse: TargetWarehouse,
-  ingredients: Array<{ id: string; units: number }>
-): Promise<string[]> {
-  const response = await fetch('/shipment', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      targetWarehouse,
-      ingredients,
-    }),
-  });
+Check availability of ingredients by ID.
 
-  if (response.status === 422) {
-    const error = await response.json();
-    throw new PartialShipmentError(
-      error.error,
-      error.successfulIds,
-      error.failedShipments
-    );
-  }
+#### Query Parameters
 
-  return response.json();
-}
+| Parameter | Description |
+|-----------|-------------|
+| `ids` | Array of ingredient IDs (repeatable parameter) |
+| `units` | Array of required units per ingredient (repeatable parameter) |
 
-// Usage
-const shipmentIds = await registerShipment(TargetWarehouse.STANDARD, [
-  { id: 'ing-1', units: 50 },
-  { id: 'ing-2', units: 30 },
-]);
+#### Example Request
+
+```bash
+GET /ingredients/availability?ids=ingredient-123&ids=ingredient-456&units=50&units=30
 ```
 
 ---
@@ -167,24 +157,65 @@ const shipmentIds = await registerShipment(TargetWarehouse.STANDARD, [
 
 ---
 
-## Import All Types
+## Schema Reference
+
+### Ingredient Request
+
+```typescript
+// Query parameters for checking ingredient availability
+import { IngredientRequest, ingredientRequestSchema } from '@pizza/api-contracts';
+
+// Example:
+const req: IngredientRequest = {
+  ids: ['ingredient-123', 'ingredient-456'],
+  units: [50, 30],
+};
+```
+
+### Ingredient Availability Response
 
 ```typescript
 import {
-  // Pizza Ordering
-  pizzaSchema,
+  IngredientAvailability,
+  CheckIngredientAvailabilityResponse,
+  checkIngredientAvailabilityResponseSchema,
+} from '@pizza/api-contracts';
+```
+
+### Import All Types
+
+```typescript
+import {
+  // Pizza ordering
   Pizza,
-  getPizzasResponseSchema,
-  GetPizzasResponse,
-  getPizzasQuerySchema,
-  GetPizzasQuery,
-  
+  pizzaSchema,
+  PizzaLog,
+  pizzaLogSchema,
+  ReadyPizzasRequest,
+  readyPizzasRequestSchema,
+  ReadyPizzasResponse,
+  readyPizzasResponseSchema,
+  AvailablePizzasRequest,
+  availablePizzasRequestSchema,
+  AvailablePizzasResponse,
+  availablePizzasResponseSchema,
+
+  // Ingredient availability
+  IngredientRequest,
+  ingredientRequestSchema,
+  IngredientAvailability,
+  ingredientAvailabilitySchema,
+  CheckIngredientAvailabilityResponse,
+  checkIngredientAvailabilityResponseSchema,
+
   // Shipment
   TargetWarehouse,
-  ingredientSchema,
   Ingredient,
-  shipmentSchema,
+  ingredientSchema,
   Shipment,
+  shipmentSchema,
+
+  // Errors
   ErrorWithStatus,
   PartialShipmentError,
 } from '@pizza/api-contracts';
