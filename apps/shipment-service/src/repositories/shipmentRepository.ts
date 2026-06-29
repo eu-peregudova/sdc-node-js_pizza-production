@@ -1,6 +1,6 @@
 import { db as defaultDb } from '../db/index.js';
 import { shipmentTable, shipmentContentTable, warehouseTable } from '../db/schema.js';
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, lt } from 'drizzle-orm';
 import { Ingredient, Shipment } from '@pizza/api-contracts';
 import { TargetWarehouse } from '../shared/types.js';
 
@@ -141,6 +141,22 @@ export class ShipmentRepository {
       await tx.delete(shipmentContentTable).where(eq(shipmentContentTable.shipment_id, id));
 
       await tx.delete(shipmentTable).where(eq(shipmentTable.id, id));
+    });
+  }
+
+  async deleteExpiredShipments(cutoff: Date): Promise<void> {
+    const expired = await this.db
+      .select({ id: shipmentTable.id })
+      .from(shipmentTable)
+      .where(lt(shipmentTable.created_at, cutoff));
+
+    if (expired.length === 0) return;
+
+    const ids = expired.map((s) => s.id);
+
+    await this.db.transaction(async (tx) => {
+      await tx.delete(shipmentContentTable).where(inArray(shipmentContentTable.shipment_id, ids));
+      await tx.delete(shipmentTable).where(inArray(shipmentTable.id, ids));
     });
   }
 }

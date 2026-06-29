@@ -11,8 +11,10 @@ import { PizzaLogRepository } from '../repositories/pizzaLogRepository.js';
 import { PizzaLogService } from '../services/pizzaLogService.js';
 import zod, { z } from 'zod';
 import { checkIngredientAvailability } from '../services/availabilityService.js';
+import PgBoss from 'pg-boss';
+import { scheduleStaleOrderJob } from '../jobs/StaleOrderJob.js';
 
-export function registerReadyController(app: FastifyInstance): void {
+export function registerReadyController(app: FastifyInstance, boss: PgBoss): void {
   app.withTypeProvider<ZodTypeProvider>().post(
     '/pizzas/ready',
     {
@@ -33,7 +35,8 @@ export function registerReadyController(app: FastifyInstance): void {
 
       try {
         for (const pizza of pizzas) {
-          await pizzaLogService.recordPizza(pizza);
+          const orderId = await pizzaLogService.recordPizza(pizza);
+          await scheduleStaleOrderJob(boss, orderId);
         }
 
         res.status(200).send({ success: true, message: 'Pizzas marked as ready' });
