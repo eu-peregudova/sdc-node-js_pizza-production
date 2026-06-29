@@ -1,0 +1,189 @@
+openapi: 3.0.0
+info:
+  title: Pizza Production Service API
+  description: API contracts for Pizza Ordering and Shipment Services
+  version: 1.0.0
+
+paths:
+  /pizzas:
+    get:
+      summary: Get pizzas made by type
+      description: Retrieve count of pizzas that have been made, grouped by type
+      tags:
+        - Pizza Ordering
+      parameters:
+        - name: status
+          in: query
+          description: Filter by status (optional)
+          schema:
+            type: string
+          example: ready
+
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPizzasResponse'
+              example:
+                - pizzaType: pineapple
+                  amount: 5
+                - pizzaType: ham
+                  amount: 1
+
+  /shipment:
+    post:
+      summary: Register a shipment
+      description: Register ingredients for shipment to a warehouse
+      tags:
+        - Shipment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShipmentRequest'
+            example:
+              targetWarehouse: M
+              ingredients:
+                - id: ingredient-123
+                  units: 50
+                - id: ingredient-456
+                  units: 30
+
+      responses:
+        '200':
+          description: Shipment registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentResponse'
+              example:
+                - shipment-id-1
+                - shipment-id-2
+
+        '422':
+          description: Partial failure - some shipments succeeded, some failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartialShipmentErrorResponse'
+              example:
+                error: Some shipments failed validation
+                successfulIds:
+                  - shipment-id-1
+                failedShipments:
+                  - targetWarehouse: L
+                    ingredients:
+                      - id: ingredient-789
+                        units: 1000
+
+components:
+  schemas:
+    # Pizza Ordering Service Schemas
+    Pizza:
+      type: object
+      required:
+        - pizzaType
+        - amount
+      properties:
+        pizzaType:
+          type: string
+          example: margherita
+        amount:
+          type: integer
+          minimum: 0
+          example: 5
+
+    GetPizzasResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Pizza'
+
+    # Shipment Service Schemas
+    TargetWarehouse:
+      type: string
+      enum:
+        - S
+        - M
+        - L
+      description: Warehouse size (S=Small, M=Standard, L=Large)
+
+    Ingredient:
+      type: object
+      required:
+        - id
+        - units
+      properties:
+        id:
+          type: string
+          description: Ingredient identifier
+          example: ingredient-123
+        units:
+          type: number
+          description: Number of units
+          example: 50
+
+    ShipmentRequest:
+      type: object
+      required:
+        - targetWarehouse
+        - ingredients
+      properties:
+        targetWarehouse:
+          $ref: '#/components/schemas/TargetWarehouse'
+        ingredients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ingredient'
+          description: List of ingredients in the shipment
+
+    ShipmentResponse:
+      type: array
+      items:
+        type: string
+        format: uuid
+      description: Array of shipment IDs created
+
+    FailedShipment:
+      type: object
+      required:
+        - targetWarehouse
+        - ingredients
+      properties:
+        targetWarehouse:
+          $ref: '#/components/schemas/TargetWarehouse'
+        ingredients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ingredient'
+
+    PartialShipmentErrorResponse:
+      type: object
+      required:
+        - error
+        - successfulIds
+        - failedShipments
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: Some shipments failed validation
+        successfulIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: IDs of successfully created shipments
+        failedShipments:
+          type: array
+          items:
+            $ref: '#/components/schemas/FailedShipment'
+          description: Shipments that failed
+
+tags:
+  - name: Pizza Ordering
+    description: Operations related to pizza information
+  - name: Shipment
+    description: Operations related to ingredient shipments

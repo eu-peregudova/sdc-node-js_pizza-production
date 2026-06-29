@@ -1,0 +1,1 @@
+ALTER TABLE "ingredient" ADD COLUMN "units" numeric DEFAULT '0' NOT NULL;

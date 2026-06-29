@@ -18,6 +18,7 @@ Table shipment_content {
 Table ingredient {
   id uuid [primary key]
   name varchar
+  units number
 }
 
 Ref: shipment.warehouse_id > warehouse.id

@@ -1,0 +1,20 @@
+{
+  "name": "@pizza/production",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "npm run build && node ./dist/main.js"
+  },
+  "dependencies": {
+    "@pizza/api-contracts": "*",
+    "fastify": "^5.8.2",
+    "fastify-type-provider-zod": "^4.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "typescript": "^5.9.3",
+    "tsx": "^4.7.0"
+  }
+}
